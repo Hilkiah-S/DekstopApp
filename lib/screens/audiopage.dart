@@ -12,12 +12,15 @@ class MyMP3Page extends StatefulWidget {
 class _MyMP3PageState extends State<MyMP3Page> {
   FlutterTts flutterTts = FlutterTts();
   List<AudioBookModel> mp3Collection = [];
+  final FocusNode _focusNode = FocusNode();
+  final FocusNode _backButtonFocusNode = FocusNode();
 
   @override
   void initState() {
     super.initState();
     initializeTTS();
     fetchBooks();
+    _backButtonFocusNode.addListener(_handleBackButtonFocus);
   }
 
   void initializeTTS() async {
@@ -54,14 +57,30 @@ class _MyMP3PageState extends State<MyMP3Page> {
     }
   }
 
+  void _handleBackButtonFocus() {
+    if (_backButtonFocusNode.hasFocus) {
+      flutterTts.speak("Go Back");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color(0xFF121212),
       appBar: AppBar(
-        title: Text('Book Store'),
-        elevation: 0,
+        foregroundColor: Colors.white,
+        leading: Focus(
+          focusNode: _backButtonFocusNode,
+          child: IconButton(
+            icon: Icon(Icons.arrow_back),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+        ),
+        title: Text("Book Store"),
         backgroundColor: Colors.transparent,
+        elevation: 0,
       ),
       body: GridView.builder(
         padding: EdgeInsets.all(20),
@@ -143,6 +162,9 @@ class _MyMP3PageState extends State<MyMP3Page> {
   @override
   void dispose() {
     flutterTts.stop();
+    _backButtonFocusNode.removeListener(_handleBackButtonFocus);
+    _focusNode.dispose();
+    _backButtonFocusNode.dispose();
     super.dispose();
   }
 }

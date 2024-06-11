@@ -9,18 +9,21 @@ import 'package:dio/dio.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:desktop/core/instance.dart';
+import 'package:desktop/screens/global.dart';
 
 class FINALPAGE extends StatefulWidget {
   List answersinternet;
-
+  String examcode;
   List answersusers;
   int total;
-  FINALPAGE(
-      {Key? mykey,
-      required this.answersinternet,
-      required this.answersusers,
-      required this.total})
-      : super(key: mykey);
+
+  FINALPAGE({
+    Key? mykey,
+    required this.answersinternet,
+    required this.answersusers,
+    required this.total,
+    required this.examcode,
+  }) : super(key: mykey);
 
   @override
   State<FINALPAGE> createState() => _FINALPAGEState();
@@ -210,29 +213,71 @@ class _FINALPAGEState extends State<FINALPAGE> {
             )));
   }
 
+  // void _sendCode() async {
+  //   print("priniting exam code about to send" + widget.examcode);
+
+  //   Response<Map<String, dynamic>> response = await Dio().post(
+  //       "http://localhost:4000/result/addResult",
+  //       data: {
+  //         "studentId": 1,
+  //         "result": widget.total,
+  //         "examId": widget.examcode,
+  //       },
+  //       options: new Options(contentType: "application/x-www-form-urlencoded"));
+
+  //   print("exam code :: " + getstorage.read("code"));
+
+  //   if (response.statusCode == 200) {
+  //     _showMyDialog();
+  //     await Future.delayed(Duration(seconds: 10));
+  //     Navigator.pushAndRemoveUntil(
+  //       context,
+  //       MaterialPageRoute(builder: (context) => Inputcode()),
+  //       (Route<dynamic> route) => false,
+  //     );
+  //     return;
+  //   } else {
+  //     _showErrorDialog();
+  //   }
+  // }
+
   void _sendCode() async {
-    var examcode = getstorage.read("code");
-    Response<Map<String, dynamic>> response = await Dio().post(
+    print("Printing exam code about to send: " + widget.examcode);
+
+    final data = {
+      "result": widget.total,
+      "examId": widget.examcode,
+    };
+
+    print("Data to be sent: $paramValue");
+
+    try {
+      Response<Map<String, dynamic>> response = await Dio().post(
         "http://localhost:4000/result/addResult",
-        data: {
-          "studentId": 1,
-          "result": widget.total,
-          "examId": examcode,
-        },
-        options: new Options(contentType: "application/x-www-form-urlencoded"));
-
-    print("exam code :: " + getstorage.read("code"));
-
-    if (response.statusCode == 200) {
-      _showMyDialog();
-      await Future.delayed(Duration(seconds: 10));
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (context) => Inputcode()),
-        (Route<dynamic> route) => false,
+        data: data,
+        options: Options(
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': 'Bearer ${paramValue} ',
+          },
+        ),
       );
-      return;
-    } else {
+
+      if (response.statusCode! >= 200 && response.statusCode! < 300) {
+        // await _showMyDialog();
+        await Future.delayed(Duration(seconds: 6));
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => Inputcode()),
+          (Route<dynamic> route) => false,
+        );
+        return;
+      } else {
+        _showErrorDialog();
+      }
+    } catch (e) {
+      print("An error occurred: $e");
       _showErrorDialog();
     }
   }

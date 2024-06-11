@@ -2,6 +2,7 @@ import 'dart:convert';
 // import 'package:hive/hive.dart';
 import 'package:desktop/http/endpoint.dart';
 import 'package:desktop/screens/question.dart';
+import 'package:desktop/screens/results.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:desktop/core/instance.dart';
@@ -34,7 +35,8 @@ class _InputcodeState extends State<Inputcode> {
   Color miccolored = Color.fromARGB(255, 40, 82, 236);
   Color miccolor = Color.fromARGB(255, 131, 130, 130);
   Color miccolorreserv = Color.fromARGB(255, 131, 130, 130);
-
+  final FocusNode _focusNode = FocusNode();
+  final FocusNode _backButtonFocusNode = FocusNode();
   @override
   void initState() {
     super.initState();
@@ -83,21 +85,36 @@ class _InputcodeState extends State<Inputcode> {
               iconTheme: IconThemeData(
                 color: Colors.black,
               ),
-              actions: [
-                ElevatedButton(
+              foregroundColor: Colors.white,
+              leading: Focus(
+                focusNode: _backButtonFocusNode,
+                onFocusChange: (hasFocus) {
+                  if (hasFocus) {
+                    flutterTts.speak("Go Back");
+                  }
+                },
+                child: IconButton(
+                  icon: Icon(Icons.arrow_back),
                   onPressed: () {
-                    //  _mybox.delete(70);
                     Navigator.of(context).pop();
                   },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.black,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                  child: Text('Logout'),
                 ),
-              ],
+              ),
+              // actions: [
+              //   ElevatedButton(
+              //     onPressed: () {
+              //       //  _mybox.delete(70);
+              //       Navigator.of(context).pop();
+              //     },
+              //     style: ElevatedButton.styleFrom(
+              //       backgroundColor: Colors.black,
+              //       shape: RoundedRectangleBorder(
+              //         borderRadius: BorderRadius.circular(10),
+              //       ),
+              //     ),
+              //     child: Text('Logout'),
+              //   ),
+              // ],
               backgroundColor: Colors.grey[200],
             ),
             //  drawer: NavBarSS(),
@@ -117,95 +134,210 @@ class _InputcodeState extends State<Inputcode> {
                       width: double.infinity,
                       height: double.infinity,
                     ),
-                    Center(
-                      child: Container(
-                        width: 450,
-                        padding: const EdgeInsets.all(20),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(10),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey.withOpacity(0.3),
-                              blurRadius: 5,
-                              offset: Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Container(
-                              width: 400,
-                              padding: const EdgeInsets.all(20),
-                              decoration: BoxDecoration(
-                                color: Colors.transparent,
-                                borderRadius: BorderRadius.circular(10),
-                                border: Border.all(
-                                    width: 2,
-                                    color: Colors.black.withOpacity(0.5)),
-                              ),
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Container(
-                                    decoration: BoxDecoration(
-                                      color: Colors.black.withOpacity(0.1),
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(10)),
-                                    ),
-                                    child: TextField(
-                                      focusNode: _inputcodefield,
-                                      onChanged: codefieldchange,
-                                      onSubmitted: ((value) {
-                                        _sendCode();
-                                      }),
-                                      autofocus: true,
-                                      controller: codetext,
-                                      decoration: InputDecoration(
-                                        labelText: 'Enter Code ',
-                                        border: InputBorder.none,
-                                        contentPadding:
-                                            const EdgeInsets.symmetric(
-                                          vertical: 15,
-                                          horizontal: 20,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  SizedBox(height: 30),
+                    Align(
+                      alignment: Alignment.center,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(15.0),
+                            child: Focus(
+                              onFocusChange: (hasFocus) {
+                                if (hasFocus) {
+                                  flutterTts.speak("Your results page");
+                                }
+                              },
+                              child:
+                                  // GestureDetector(
+                                  //   onTap: () {
+                                  //     Navigator.push(
+                                  //         context,
+                                  //         MaterialPageRoute(
+                                  //             builder: (context) => ResultsPage()));
+                                  //   },
+                                  //   child: Container(
+                                  //     width: 450,
+                                  //     height: 200,
+                                  //     decoration: BoxDecoration(
+                                  //         color: Colors.white,
+                                  //         borderRadius: BorderRadius.all(
+                                  //             Radius.circular(15))),
+                                  //     child: Padding(
+                                  //       padding: const EdgeInsets.all(20.0),
+                                  //       child: Container(
+                                  //         decoration: BoxDecoration(
+                                  //             borderRadius: BorderRadius.all(
+                                  //                 Radius.circular(15)),
+                                  //             border: Border.all(
+                                  //                 color:
+                                  //                     Colors.black.withOpacity(0.5),
+                                  //                 width: 2)),
+                                  //         child: Center(
+                                  //           child: Text(
+                                  //             "Your Results",
+                                  //             style: TextStyle(fontSize: 20),
+                                  //           ),
+                                  //         ),
+                                  //       ),
+                                  //     ),
+                                  //   ),
+                                  // ),
                                   ElevatedButton(
-                                    onPressed: isButtonActive
-                                        ? () {
-                                            print("LOGIN");
-                                            _sendCode();
-                                          }
-                                        : null,
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.black,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                    ),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor:
+                                      Colors.white, // Background color
+                                  foregroundColor: Colors.black, // Text color
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(15),
+                                  ),
+                                  padding: EdgeInsets
+                                      .zero, // Remove padding to align with inner padding
+                                  side: BorderSide(
+                                    color: Colors.black.withOpacity(0.5),
+                                    width: 2,
+                                  ),
+                                  minimumSize: Size(450, 200),
+                                ),
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => ResultsPage()),
+                                  );
+                                },
+                                child: Container(
+                                  width: 450,
+                                  height: 200,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(15)),
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(20.0),
                                     child: Container(
-                                      width: double.infinity,
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 15),
-                                      alignment: Alignment.center,
-                                      child: Text(
-                                        'Submit',
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(15)),
+                                        border: Border.all(
+                                          color: Colors.black.withOpacity(0.5),
+                                          width: 2,
+                                        ),
+                                      ),
+                                      child: Center(
+                                        child: Text(
+                                          "Your Results",
+                                          style: TextStyle(
+                                              fontSize: 20,
+                                              color: Colors.black),
                                         ),
                                       ),
                                     ),
                                   ),
-                                ],
+                                ),
                               ),
                             ),
-                          ],
-                        ),
+                          ),
+                          Container(
+                            width: 450,
+                            padding: const EdgeInsets.all(20),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(10),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.3),
+                                  blurRadius: 5,
+                                  offset: Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceAround,
+                                  children: [
+                                    Container(
+                                      width: 400,
+                                      padding: const EdgeInsets.all(20),
+                                      decoration: BoxDecoration(
+                                        color: Colors.transparent,
+                                        borderRadius: BorderRadius.circular(10),
+                                        border: Border.all(
+                                            width: 2,
+                                            color:
+                                                Colors.black.withOpacity(0.5)),
+                                      ),
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Container(
+                                            decoration: BoxDecoration(
+                                              color:
+                                                  Colors.black.withOpacity(0.1),
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(10)),
+                                            ),
+                                            child: TextField(
+                                              focusNode: _inputcodefield,
+                                              onChanged: codefieldchange,
+                                              onSubmitted: ((value) {
+                                                _sendCode();
+                                              }),
+                                              autofocus: true,
+                                              controller: codetext,
+                                              decoration: InputDecoration(
+                                                labelText: 'Enter Code ',
+                                                border: InputBorder.none,
+                                                contentPadding:
+                                                    const EdgeInsets.symmetric(
+                                                  vertical: 15,
+                                                  horizontal: 20,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          SizedBox(height: 30),
+                                          ElevatedButton(
+                                            onPressed: isButtonActive
+                                                ? () {
+                                                    print("LOGIN");
+                                                    _sendCode();
+                                                  }
+                                                : null,
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor: Colors.black,
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
+                                              ),
+                                            ),
+                                            child: Container(
+                                              width: double.infinity,
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      vertical: 15),
+                                              alignment: Alignment.center,
+                                              child: Text(
+                                                'Submit',
+                                                style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
@@ -224,11 +356,11 @@ class _InputcodeState extends State<Inputcode> {
           },
           options:
               new Options(contentType: "application/x-www-form-urlencoded"));
-
-      if (response.statusCode == 200) {
+      print(response);
+      if (response.data!['success']) {
         getstorage.write("code", response.data!['examCode']);
 
-        List<dynamic> rawData = response.data!['questions'];
+        List<dynamic> rawData = response.data!['data']['questions'];
         print(rawData);
         suns = rawData.map<Internet>((dataItem) {
           return Internet.fromMap(dataItem as Map<String, dynamic>);
@@ -238,15 +370,16 @@ class _InputcodeState extends State<Inputcode> {
         throw Exception(
             'Failed to load questions with status code: ${response.statusCode}');
       }
-      print(suns[0].question);
+      // print(suns[0].question);
 
-      int? internettime = response.data!['duration']?.isEmpty == true
+      int? internettime = response.data!['data']['duration']?.isEmpty == true
           ? null
-          : int.tryParse(response.data!['duration']!);
+          : int.tryParse(response.data!['data']['duration']!);
       print(internettime);
       // _mybox.put(57,codetext.text);
       Navigator.of(context).push(MaterialPageRoute(
           builder: (context) => Question(
+                examcode: response.data!['data']['examCode'],
                 questions: suns,
                 seconds: internettime!,
               )));
